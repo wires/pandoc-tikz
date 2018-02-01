@@ -11,3 +11,8 @@ To process pandoc, it uses a filter. This python thing uses stdin/out to process
 
 In order to output some debug info, we log to `log.txt` from `tikz.py`
 
+#### references
+
+- http://pandoc.org/filters.html
+- https://github.com/jgm/pandocfilters
+
