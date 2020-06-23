@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """
 Pandoc filter to process raw latex tikz environments into images.
@@ -14,6 +14,7 @@ import sys
 from subprocess import call
 from tempfile import mkdtemp
 
+import pandocfilters
 from pandocfilters import toJSONFilter, Para, Image, get_filename4code, get_extension
 
 lg = open('log.txt', 'w+')
@@ -22,6 +23,7 @@ def tikz2image(tikz_src, filetype, outfile):
     tmpdir = mkdtemp()
     olddir = os.getcwd()
     os.chdir(tmpdir)
+
     f = open('tikz.tex', 'w')
     f.write("""\\documentclass{standalone}
              \\usepackage{tikz}
@@ -36,7 +38,7 @@ def tikz2image(tikz_src, filetype, outfile):
     lg.write('files={}\n'.format(os.listdir(tmpdir)))
     os.chdir(olddir)
     lg.write("olddir='{}', tmpdir='{}'\n".format(olddir, tmpdir))
-    lg.write("filetype='{}', file='{}'\n".format(filetype, file))
+    lg.write("filetype='{}', file='{}'\n".format(filetype, 'tikz.tex'))
     if filetype == 'pdf':
         f1 = os.path.join(tmpdir, 'tikz.pdf')
         f2 = '{}.pdf'.format(outfile)
@@ -52,9 +54,9 @@ def tikz2image(tikz_src, filetype, outfile):
 
 
 def tikz(key, value, format, _):
-    if key == 'RawBlock':
+    if key == 'CodeBlock':
         [fmt, code] = value
-        if fmt == "latex" and re.match("\\\\begin{tikzpicture}", code):
+        if "tikz" in fmt[1]:
             outfile = get_filename4code("tikz", code)
             filetype = get_extension(format, "png", html="png", latex="pdf")
             src = outfile + '.' + filetype
